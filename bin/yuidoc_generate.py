@@ -23,7 +23,7 @@ import os, re, shutil, logging, logging.config, time, datetime
 from const import *
 # from cStringIO import StringIO 
 from Cheetah.Template import Template
-from sets import Set
+# from sets import Set
 import codecs
 
 try:
