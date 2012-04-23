@@ -64,7 +64,7 @@ class DocHighlighter(object):
             except: 
                 return "File could not be highlighted"
 
-        def highlightFile(path, file):
+        def highlightFile(path, file, head):
             f=open(os.path.join(path, file))
             fileStr = codecs.open( os.path.join(path, file), "r", "utf-8" ).read()
 
@@ -75,24 +75,26 @@ class DocHighlighter(object):
 
             highlighted = highlightString(fileStr)
 
-            out = codecs.open( os.path.join(self.outputdir, file + self.newext), "w", "utf-8" )
+            out = codecs.open( os.path.join(self.outputdir, head, file + self.newext), "w", "utf-8" )
             out.write(highlighted)
             out.close()
 
-        def highlightDir(path):
+        def highlightDir(path, head=""):
             subdirs = []
+            heads = []
             dircontent = ""
             for i in os.listdir(path):
                 fullname = os.path.join(path, i)
                 if os.path.isdir(fullname):
                     subdirs.append(fullname)
+                    heads.append(i)
                 else:
                     for ext in self.ext_check:
                         if i.lower().endswith(ext):
-                            highlightFile(path, i)
+                            highlightFile(path, i, head)
 
-            for i in subdirs:
-                highlightDir(i)
+            for h, i in zip(heads, subdirs):
+                highlightDir(i, os.path.join(head, h))
 
         self.inputdirs = inputdirs
         self.outputdir = os.path.abspath(outputdir)

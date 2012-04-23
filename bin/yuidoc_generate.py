@@ -34,6 +34,16 @@ except:
 log = logging.getLogger('yuidoc.generate')
 
 
+def _mkdir(newdir):
+    if os.path.isdir(newdir): pass
+    elif os.path.isfile(newdir):
+        raise OSError("a file with the same name as the desired " \
+                      "dir, '%s', already exists." % newdir)
+    else:
+        head, tail = os.path.split(newdir)
+        if head and not os.path.isdir(head): _mkdir(head)
+        if tail: os.mkdir(newdir)
+
 class DocGenerator(object):
 
     def __init__(self, inpath, datafile, outpath, templatepath, newext, showprivate=False, 
@@ -42,17 +52,6 @@ class DocGenerator(object):
                  projecturl='http://developer.yahoo.com/yui/', 
                  ydn=False, copyrighttag='Yahoo! Inc.'):
 
-        def _mkdir(newdir):
-            if os.path.isdir(newdir): pass
-            elif os.path.isfile(newdir):
-                raise OSError("a file with the same name as the desired " \
-                              "dir, '%s', already exists." % newdir)
-            else:
-                head, tail = os.path.split(newdir)
-                if head and not os.path.isdir(head): _mkdir(head)
-                if tail: os.mkdir(newdir)
-
-       
         self.moduleprefix = MODULE_PREFIX
         self.inpath       = os.path.abspath(inpath)
 
@@ -122,6 +121,8 @@ class DocGenerator(object):
         return self.moduleprefix + cleansed
 
     def write(self, filename, data, template=True):
+        head, tail = os.path.split(filename)
+        _mkdir(os.path.join(self.outpath, head))
         out = codecs.open( os.path.join(self.outpath, filename), "w", "utf-8" )
 
         if template:
@@ -134,7 +135,7 @@ class DocGenerator(object):
 
     def process(self):
 
-        def assignGlobalProperties(template):
+        def assignGlobalProperties(template, pathlen=0):
             template.projectname  = self.projectname
             template.projecturl   = self.projecturl
             template.copyrighttag = self.copyrighttag
@@ -151,8 +152,17 @@ class DocGenerator(object):
             template.year         = datetime.date.today().strftime('%Y')
 
             template.filename     = self.filename
+            template.assetspath   = ""
+
+            def _assetspath(pathlen):
+                if pathlen > 0:
+                    return "../" + _assetspath(pathlen - 1)
+                else:
+                    return ""
+
             if self.filename:
                 template.filepath = os.path.join(self.inpath, self.filename)
+                template.assetspath = _assetspath(pathlen)
                 template.highlightcontent = codecs.open(os.path.join(self.inpath, self.filename + self.newext), "r", "utf-8" ).read()
 
             template.pagetype     = self.pagetype
@@ -727,10 +737,18 @@ class DocGenerator(object):
             self.write( t.cleansedmodulename + ".html", t)
 
             # class source view
+            def _pathlen(path):
+                if (path):
+                    head, tail = os.path.split(path)
+                    return _pathlen(head) + 1
+                else:
+                    return 0
+
             for i in m[FILE_LIST]:
                 log.info("Generating source view for " + i)
+                head, tail = os.path.split(i)
                 self.filename = i
-                assignGlobalProperties(t)
+                assignGlobalProperties(t, _pathlen(head))
                 self.write("%s.html" %(self.filename), t)
 
 

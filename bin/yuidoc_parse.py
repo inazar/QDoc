@@ -48,23 +48,25 @@ class DocParser(object):
                 if head and not os.path.isdir(head): _mkdir(head)
                 if tail: os.mkdir(newdir)
 
-        def parseFile(path, file):
+        def parseFile(path, file, head):
             f = codecs.open(os.path.join(path, file), "r", "utf-8" )
             fileStr = f.read()
             log.info("parsing " + file)
             # add a file marker token so the parser can keep track of what is in what file
-            content = "\n/** @%s %s \n*/\n" % (FILE_MARKER, file)
+            content = "\n/** @%s %s \n*/\n" % (FILE_MARKER, os.path.join(head, file))
 
             # copy
             # out = open(os.path.join(self.outputdir, file), "w")
-            out = codecs.open( os.path.join(self.outputdir, file), "w", "utf-8" )
+            _mkdir(os.path.join(self.outputdir, head))
+            out = codecs.open( os.path.join(self.outputdir, head, file), "w", "utf-8" )
             out.writelines(fileStr)
             out.close()
 
             return content + fileStr
 
-        def parseDir(path):
+        def parseDir(path, head=""):
             subdirs = []
+            heads = []
             dircontent = ""
             dirfiles = os.listdir(path)
             dirfiles.sort()
@@ -77,13 +79,14 @@ class DocParser(object):
                         fullname = os.path.join(path, i)
                         if os.path.isdir(fullname):
                             subdirs.append(fullname)
+                            heads.append(i)
                         else:
                             for ext in self.extension_check:
                                 if i.lower().endswith(ext):
-                                    dircontent += parseFile(path, i)
+                                    dircontent += parseFile(path, i, head)
 
-            for i in subdirs:
-                dircontent += parseDir(i)
+            for h, i in zip(heads, subdirs):
+                dircontent += parseDir(i, os.path.join(head, h))
 
             return dircontent
 

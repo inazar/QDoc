@@ -5,11 +5,11 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 	<title>API: $modulename #if $classname# $classname #end if# #if $filename# $filename #end if# (Q Framework)</title>
 
-	<link rel="stylesheet" type="text/css" href="assets/reset-fonts-grids-min.css#if $timestamp#?stamp=$timestamp#end if#" />
-	<link rel="stylesheet" type="text/css" href="assets/api.css#if $timestamp#?stamp=$timestamp#end if#" />
+	<link rel="stylesheet" type="text/css" href="${assetspath}assets/reset-fonts-grids-min.css#if $timestamp#?stamp=$timestamp#end if#" />
+	<link rel="stylesheet" type="text/css" href="${assetspath}assets/api.css#if $timestamp#?stamp=$timestamp#end if#" />
 
-    <script type="text/javascript" src="assets/api-js#if $timestamp#?stamp=$timestamp#end if#"></script>
-    <script type="text/javascript" src="assets/ac-js#if $timestamp#?stamp=$timestamp#end if#"></script>
+    <script type="text/javascript" src="${assetspath}assets/api-js#if $timestamp#?stamp=$timestamp#end if#"></script>
+    <script type="text/javascript" src="${assetspath}assets/ac-js#if $timestamp#?stamp=$timestamp#end if#"></script>
 </head>
 
 <body id="yahoo-com">
@@ -18,9 +18,9 @@
 	<div id="hd">
         <!-- h1><a href="$projecturl" title="$projectname">$projectname</a></h1 -->
         <h3>$moduletitle&nbsp; <span class="subtitle">$version</span></h3>
-        <a href="./index.html" title="$projectname">$projectname</a> 
+        <a href="${assetspath}index.html" title="$projectname">$projectname</a> 
         #if $modulename
-            &gt; <a href="./${cleansedmodulename}.html" title="$modulename">$modulename</a>
+            &gt; <a href="${assetspath}${cleansedmodulename}.html" title="$modulename">$modulename</a>
                 #if $classname# &gt; $classname #end if#
                 #if $filename# &gt; $filename (source view) #end if#
         #end if
@@ -73,13 +73,13 @@
                             Class <b property="yui:name">$classname</b>
                         <span class="extends">
                         #if $extends
-                           - extends <a href="${extends}.html" title="$extends">$extends</a>
+                           - extends <a href="${assetspath}${extends}.html" title="$extends">$extends</a>
                         #end if
                         </span>
 
                         <span class="implements">
                         #if $implements
-                           - implements <a href="${implements}.html" title="$implements">$implements</a>
+                           - implements <a href="${assetspath}${implements}.html" title="$implements">$implements</a>
                         #end if
                         </span>
 
@@ -89,7 +89,7 @@
                             #set $i=0
                             #for $provider in $uses##if $i > 0#, #end if#
                                 <span rel="extend" resource="${provider}.html">
-                                <a href="${provider}.html" property="yui:name" title="$provider">$provider</a>#set $i=$i+1#
+                                <a href="${assetspath}${provider}.html" property="yui:name" title="$provider">$provider</a>#set $i=$i+1#
                                 </span>
                             #end for#
                             
@@ -104,7 +104,7 @@
                             <dd>
                                 #for $subclass in $subclasses
                                     <span rel="yui:subclass" resource="${subclass}.html">
-                                    <a href="${subclass}.html" property="yui:name" title="$subclass">$subclass</a>
+                                    <a href="${assetspath}${subclass}.html" property="yui:name" title="$subclass">$subclass</a>
                                     </span>
                                 #end for
                             </dd>
@@ -117,7 +117,7 @@
                             <dd>
                                 #for $subclass in $implementations
                                     <span rel="yui:subclass" resource="${subclass}.html">
-                                    <a href="${subclass}.html" property="yui:name" title="$subclass">$subclass</a>
+                                    <a href="${assetspath}${subclass}.html" property="yui:name" title="$subclass">$subclass</a>
                                     </span>
                                 #end for
                             </dd>
@@ -243,14 +243,14 @@
                         <div rel="yui:inheritance">
                         #for $superclassname in $inherited.properties
                         <div class="section field inheritance" rel="yui:superclass"  resource="${superclassname}.html">
-                            <h4>Properties inherited from <a href="${superclassname}.html" property="yui:name" title="$superclassname">$superclassname</a>:</h4>
+                            <h4>Properties inherited from <a href="${assetspath}${superclassname}.html" property="yui:name" title="$superclassname">$superclassname</a>:</h4>
                             <div class="content" rel="yui:properties">
                                 <code>
                                     #set i=0
                                     #set l=len($inherited.properties[$superclassname])-1
                                     #for $prop in $inherited.properties[$superclassname]#
                                         <span rel="yui:property" resource="${superclassname}.html#property_$prop.name">
-                                        <a class="$prop.access#if $prop.deprecated# deprecated#end if#" href="${superclassname}.html#property_$prop.name" property="yui:name" title="$prop.name">$prop.name</a>#if $i<$l#<span class="$prop.access#if $prop.deprecated# deprecated#end if#">,</span>#end if#
+                                        <a class="$prop.access#if $prop.deprecated# deprecated#end if#" href="${assetspath}${superclassname}.html#property_$prop.name" property="yui:name" title="$prop.name">$prop.name</a>#if $i<$l#<span class="$prop.access#if $prop.deprecated# deprecated#end if#">,</span>#end if#
                                         </span>
                                         #set i=i+1
                                     #end for#
@@ -367,14 +367,14 @@
                         <div rel="yui:inheritance">                    
                         #for $superclassname in $inherited.methods
                             <div class="section field inheritance" rel="yui:superclass"  resource="${superclassname}.html">
-                                <h4>Methods inherited from <a href="${superclassname}.html" property="yui:name" title="$superclassname">$superclassname</a>:</h4>
+                                <h4>Methods inherited from <a href="${assetspath}${superclassname}.html" property="yui:name" title="$superclassname">$superclassname</a>:</h4>
                                 <div class="content" rel="yui:methods">
                                     <code>
                                         #set i=0
                                         #set l=len($inherited.methods[$superclassname])-1
                                         #for $method in $inherited.methods[$superclassname]
                                             <span rel="yui:method" resource="${superclassname}.html#method_$method.name">                                        
-                                            <a class="$method.access#if $method.deprecated# deprecated#end if#" href="${superclassname}.html#method_$method.name" property="yui:name" title="$method.name">$method.name</a>#if $i<$l#<span class="$method.access#if $method.deprecated# deprecated#end if#">,</span>#end if#
+                                            <a class="$method.access#if $method.deprecated# deprecated#end if#" href="${assetspath}${superclassname}.html#method_$method.name" property="yui:name" title="$method.name">$method.name</a>#if $i<$l#<span class="$method.access#if $method.deprecated# deprecated#end if#">,</span>#end if#
                                             </span>
                                             #set i=i+1
                                             #end for
@@ -458,7 +458,7 @@
 
                                             #if $event.bubbles
                                             <div class="bubbles">
-                                                <strong>Bubbles:</strong> This event bubbles to <a href="${event.bubbles}.html" title="$event.bubbles">$event.bubbles</a>.
+                                                <strong>Bubbles:</strong> This event bubbles to <a href="${assetspath}${event.bubbles}.html" title="$event.bubbles">$event.bubbles</a>.
                                             </div>        
                                             #end if
                                             #if $event.preventable
@@ -487,7 +487,7 @@
                         <div rel="yui:inheritance">                    
                         #for $superclassname in $inherited.events
                         <div class="section field inheritance" rel="yui:superclass"  resource="${superclassname}.html">
-                            <h4>Events inherited from <a href="${superclassname}.html" property="yui:name" title="$superclassname">$superclassname</a>:</h4>
+                            <h4>Events inherited from <a href="${assetspath}${superclassname}.html" property="yui:name" title="$superclassname">$superclassname</a>:</h4>
                             <div class="content" rel="yui:events">
                                 <code>
                                     #set i=0
@@ -495,7 +495,7 @@
                                     #for $event in $inherited.events[$superclassname]
                                         #set i=i+1
                                         <span rel="yui:event" resource="${superclassname}.html#event_$event.name">
-                                        <a class="$event.access#if $event.deprecated# deprecated#end if#" href="${superclassname}.html#event_$event.name" property="yui:name" title="$event.name">$event.name</a>#if $i<$l#<span class="$event.access#if $event.deprecated# deprecated#end if#">,</span>#end if##set i=i+1#
+                                        <a class="$event.access#if $event.deprecated# deprecated#end if#" href="${assetspath}${superclassname}.html#event_$event.name" property="yui:name" title="$event.name">$event.name</a>#if $i<$l#<span class="$event.access#if $event.deprecated# deprecated#end if#">,</span>#end if##set i=i+1#
                                         </span>
                                     #end for#
                                 </code>
@@ -546,7 +546,7 @@
                         <div rel="yui:inheritance">                    
                         #for $superclassname in $inherited.configs
                         <div class="section field inheritance" rel="yui:superclass"  resource="${superclassname}.html">
-                            <h4>Configuration attributes inherited from <a href="${superclassname}.html" property="yui:name" title="$superclassname">$superclassname</a>:</h4>
+                            <h4>Configuration attributes inherited from <a href="${assetspath}${superclassname}.html" property="yui:name" title="$superclassname">$superclassname</a>:</h4>
                             <div class="content" rel="yui:attributes">
                                 <code>
                                     #set i=0
@@ -554,7 +554,7 @@
                                     #for $config in $inherited.configs[$superclassname]
                                         #set i=i+1
                                         <span rel="yui:attribute" resource="${superclassname}.html#config_$config.name">                                        
-                                        <a class="$config.access#if $config.deprecated# deprecated#end if#" href="${superclassname}.html#config_$config.name" property="yui:name" title="$config.name">$config.name</a>#if $i<$l#<span class="$config.access#if $config.deprecated# deprecated#end if#">,</span>#end if#
+                                        <a class="$config.access#if $config.deprecated# deprecated#end if#" href="${assetspath}${superclassname}.html#config_$config.name" property="yui:name" title="$config.name">$config.name</a>#if $i<$l#<span class="$config.access#if $config.deprecated# deprecated#end if#">,</span>#end if#
                                         </span>
                                         #set i=i+1
                                         #end for#
@@ -607,7 +607,7 @@
                                 <ul>
                                 #set $counter = 0
                                 #for $classNames in $classList_raw
-                                    <li><a href="${classNames.name}.html" title="$classNames.name" id="class_${counter}">$classNames.guessedname</a></li>
+                                    <li><a href="${assetspath}${classNames.name}.html" title="$classNames.name" id="class_${counter}">$classNames.guessedname</a></li>
                                     #set $counter = $counter + 1
                                 #end for
                                 </ul>
@@ -650,7 +650,7 @@
                                     #set $css = "selected"
                                 #end if
                                 #set $cleansedname = $cleansedmodulenames[$moduledef]
-                                <li class="$css"><a href="${cleansedname}.html" title="$moduledef">$moduledef</a></li>
+                                <li class="$css"><a href="${assetspath}${cleansedname}.html" title="$moduledef">$moduledef</a></li>
                             #end for
                         </ul>
                     </div>
@@ -665,7 +665,7 @@
                                 #if $classdef == $classname
                                     #set $css = "selected"
                                 #end if
-                                <li class="$css"><a href="${classdef}.html" title="$classdef">$classdef</a></li>
+                                <li class="$css"><a href="${assetspath}${classdef}.html" title="$classdef">$classdef</a></li>
                             #end for
                         </ul>
                     </div>
@@ -680,7 +680,7 @@
                                 #if $filedef == $filename
                                     #set $css = "selected"
                                 #end if
-                                <li class="$css"><a href="${filedef}.html" title="$filedef">$filedef</a></li>
+                                <li class="$css"><a href="${assetspath}${filedef}.html" title="$filedef">$filedef</a></li>
                             #end for
                         </ul>
                     </div>
@@ -691,7 +691,7 @@
                         <h4>Properties</h4>
                         <ul class="content">        
                             #for $prop in $properties
-                                <li class="${prop.access}#if $prop.deprecated# deprecated#end if#"><a href="#property_${prop.name}" title="$prop.name">$prop.name</a></li>
+                                <li class="${prop.access}#if $prop.deprecated# deprecated#end if#"><a href="${assetspath}#property_${prop.name}" title="$prop.name">$prop.name</a></li>
                             #end for
                         </ul>
                     </div>
@@ -702,7 +702,7 @@
                         <h4>Methods</h4>
                         <ul class="content">        
                             #for $method in $methods
-                                <li class="${method.access}#if $method.deprecated# deprecated#end if#"><a href="#method_${method.name}" title="$method.name">$method.name</a></li>
+                                <li class="${method.access}#if $method.deprecated# deprecated#end if#"><a href="${assetspath}#method_${method.name}" title="$method.name">$method.name</a></li>
                             #end for
                         </ul>
                     </div>
@@ -713,7 +713,7 @@
                         <h4>Events</h4>
                         <ul class="content">        
                             #for $event in $events
-                                <li class="${event.access}#if $event.deprecated# deprecated#end if#"><a href="#event_${event.name}" title="$event.name">$event.name</a></li>
+                                <li class="${event.access}#if $event.deprecated# deprecated#end if#"><a href="${assetspath}#event_${event.name}" title="$event.name">$event.name</a></li>
                             #end for
                         </ul>
                     </div>
@@ -724,7 +724,7 @@
                         <h4>Configuration Attributes</h4>
                         <ul class="content">        
                             #for $config in $configs
-                                <li class="${config.access}#if $config.deprecated# deprecated#end if#"><a href="#config_${config.name}" title="$config.name">$config.name</a></li>
+                                <li class="${config.access}#if $config.deprecated# deprecated#end if#"><a href="${assetspath}#config_${config.name}" title="$config.name">$config.name</a></li>
                             #end for
                         </ul>
                     </div>
