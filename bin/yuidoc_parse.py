@@ -7,6 +7,8 @@ Copyright (c) 2010, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.net/yui/license.html
 version: 1.0.0b1
+
+modified to handle @abstract @interface @implements @throws tags
 '''
 
 ''' A class to parse Javadoc style comments out of javascript to document 
@@ -198,7 +200,7 @@ class DocParser(object):
 
     # tags that do not require a description, used by the tokenizer so that these
     # tags can be used above the block description without breaking things
-    singleTags = "constructor public private protected static final beta experimental writeonce readonly global chainable"
+    singleTags = "constructor public private protected static interface abstract final constant beta experimental writeonce readonly global chainable"
 
     # guess the name and type of a block based upon the code following it
     guess_pat = re.compile('\s*?(var|function)?\s*?(\w+)\s*?[=:]\s*?(function)?.*', re.S)
@@ -370,6 +372,44 @@ class DocParser(object):
                 dict[RETURN] = { TYPE: type , DESCRIPTION: description }
                 tokenMap.pop(RETURN)
             return dict
+
+        def parseThrows(tokenMap, dict, srctag=THROW, desttag=THROWS):
+            if srctag in tokenMap:
+                # params must be an array because they need to stay in order
+                if not desttag in dict: dict[desttag] = []
+                for i in tokenMap[srctag]:
+                    try:
+                        # type, description = self.compound_pat.sub(compound_sub, i)
+
+                        match = self.compound_pat.match(i)
+
+                        if match:
+                            if match.group(4):
+                                type, description = "", match.group(4) + match.group(5)
+                            else:
+                                type, description = match.group(2), (match.group(1) + match.group(3)).strip()
+
+                        else:
+                            type, description = "", ""
+
+
+                    except:
+                        log.error("\nError, a throws could not be parsed:\n\n %s\n\n %s\n" %(i, pprint.pformat(tokenMap)))
+                        sys.exit()
+
+                    mo = self.param_pat.match(description)
+                    if mo:
+                        # description.encode('utf-8', 'xmlcharrefreplace')
+
+                        dict[desttag].append({  
+                                TYPE:        type, 
+                                DESCRIPTION: description 
+                            })
+                    else:
+                        log.error("Error, could not parse throws -- %s, %s --" %(type, description))
+
+                tokenMap.pop(srctag)
+            return dict 
 
         def defineClass(name):
             # log.info("\nDefine Class: " + name + ", " + self.currentModule)
@@ -627,7 +667,7 @@ it was empty" % token
                 # shortName, longName = self.getClassName(tokenMap["extends"][0], self.currentNamespace)
                 longName = tokenMap["extends"][0]
                 target["superclass"] = longName
-                
+
             if "uses" in tokenMap:
                 target["uses"] = []
                 for i in tokenMap["uses"]:
@@ -667,6 +707,7 @@ it was empty" % token
             else:
                 c[METHODS][method] = parseParams(tokenMap, {})
                 c[METHODS][method] = parseReturn(tokenMap, c[METHODS][method])
+                c[METHODS][method] = parseThrows(tokenMap, c[METHODS][method])
 
             target = c[METHODS][method]
 

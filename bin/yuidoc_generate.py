@@ -7,6 +7,8 @@ Copyright (c) 2010, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.net/yui/license.html
 version: 1.0.0b1
+
+modified to handle @abstract @interface @implements @throws tags
 '''
 
 ''' Prints documentation with htmltmpl from the json data outputted by parser.py  ''' 
@@ -165,6 +167,7 @@ class DocGenerator(object):
             template.events  = ""
             template.configs = ""
             template.extends = ""
+            template.implements = ""
             template.uses   = ""
             template.index = False # is this the index page
 
@@ -393,6 +396,10 @@ class DocGenerator(object):
                     transferToTemplate( DESCRIPTION, c, t )
                     transferToTemplate( STATIC, c, t )
                     if STATIC in c: t.static = STATIC
+                    transferToTemplate( ABSTRACT, c, t )
+                    if ABSTRACT in c: t.abstract = ABSTRACT
+                    transferToTemplate( INTERFACE, c, t )
+                    if INTERFACE in c: t.interface = INTERFACE
                     transferToTemplate( FINAL, c, t )
                     if FINAL in c: t.final = FINAL
                     transferToTemplate( ACCESS, c, t )
@@ -412,9 +419,17 @@ class DocGenerator(object):
 
                     t.subclasses = subclasses
 
+                    #implementations
+                    implementations = self.implementations = []
+                    for j in classes:
+                        if IMPLEMENTS in classes[j] and classes[j][IMPLEMENTS] == i:
+                            implementations.append(j)
+
+                    t.implementations = implementations
+
                     gName = i.replace('YAHOO.widget.', '');
                     gName = gName.replace('YAHOO.util.', '');
-                    classInfo = { DESCRIPTION: desc, NAME: i, GUESSEDNAME: gName, EXTENDS: [] }
+                    classInfo = { DESCRIPTION: desc, NAME: i, GUESSEDNAME: gName, EXTENDS: [], IMPLEMENTS: [] }
 
 
                     # Properties/fields
@@ -451,6 +466,8 @@ class DocGenerator(object):
                                 if STATIC in prop: propdata[STATIC] = STATIC
                                 transferToDict( FINAL,      prop, propdata           )
                                 if FINAL in prop: propdata[FINAL] = FINAL
+                                transferToDict( CONSTANT,      prop, propdata           )
+                                if CONSTANT in prop: propdata[CONSTANT] = CONSTANT
                                 props.append(propdata)
 
 
@@ -498,6 +515,15 @@ class DocGenerator(object):
                                         transferToDict( TYPE,        p, param, OBJECT )
                                         transferToDict( DESCRIPTION, p, param )
                                         params.append(param)
+
+                                throws = methoddata[THROWS] = []
+                                if THROWS in method:
+                                    mt = method[THROWS]
+                                    for p in mt:
+                                        throw = {}
+                                        transferToDict( TYPE,        p, throw, EXCEPTION )
+                                        transferToDict( DESCRIPTION, p, throw )
+                                        throws.append(throw)
 
                                 methods.append(methoddata)
 
@@ -556,6 +582,15 @@ class DocGenerator(object):
                                         transferToDict( DESCRIPTION, p, param )
                                         params.append(param)
 
+                                throws = eventdata[THROWS] = []
+                                if THROWS in event:
+                                    mt = event[THROWS]
+                                    for t in mt:
+                                        throw = {}
+                                        transferToDict( TYPE,        p, throw, EXCEPTION )
+                                        transferToDict( DESCRIPTION, p, throw )
+                                        throws.append(throw)
+
                                 events.append(eventdata)
 
                     # configs
@@ -600,6 +635,11 @@ class DocGenerator(object):
                             superc = classes[supercname]
                             getPropsFromSuperclass(superc, classes, inherited)
 
+                    # get implemented data
+                    implemented = t.implemented = {PROPERTIES:{}, METHODS:{}, EVENTS:{}, CONFIGS:{}, SUPERCLASS: {} }
+                    if IMPLEMENTS in c:
+                        supercname = t.implements = c[IMPLEMENTS]
+
                     if USES in c:
                         for supercname in c[USES]:
                             t.uses = c[USES]
@@ -615,6 +655,15 @@ class DocGenerator(object):
                     
                     inherited[SUPERCLASS] = extends
                     classInfo[EXTENDS] = inherited
+ 
+                    implements = {}
+                    for i in implemented:
+                        for a in implemented[i]:
+                            implements[a] = a
+                    
+                    implemented[IMPLEMENTATION] = implements
+                    classInfo[IMPLEMENTS] = implemented
+
                     classList.append(classInfo)
 
                     # Constructor -- technically the parser can take multiple constructors
@@ -637,6 +686,15 @@ class DocGenerator(object):
                                 transferToDict( TYPE,        p, param, OBJECT )
                                 transferToDict( DESCRIPTION, p, param )
                                 params.append(param)
+
+                        throws = constructordata[THROWS] = []
+                        if THROWS in constructor:
+                            ct = constructor[THROWS]
+                            for p in ct:
+                                throw = {}
+                                transferToDict( TYPE,        p, throw, EXCEPTION )
+                                transferToDict( DESCRIPTION, p, throw )
+                                throws.append(throw)
 
 
                     # write module splash

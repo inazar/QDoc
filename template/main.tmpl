@@ -3,7 +3,7 @@
 <html xmlns:yui="http://yuilibrary.com/rdf/1.0/yui.rdf#">
 <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-	<title>API: $modulename #if $classname# $classname #end if# #if $filename# $filename #end if# (YUI Library)</title>
+	<title>API: $modulename #if $classname# $classname #end if# #if $filename# $filename #end if# (Q Framework)</title>
 
 	<link rel="stylesheet" type="text/css" href="assets/reset-fonts-grids-min.css#if $timestamp#?stamp=$timestamp#end if#" />
 	<link rel="stylesheet" type="text/css" href="assets/api.css#if $timestamp#?stamp=$timestamp#end if#" />
@@ -16,7 +16,7 @@
 
 <div id="doc3" class="yui-t2">
 	<div id="hd">
-        <h1><a href="$projecturl" title="$projectname">$projectname</a></h1>
+        <!-- h1><a href="$projecturl" title="$projectname">$projectname</a></h1 -->
         <h3>$moduletitle&nbsp; <span class="subtitle">$version</span></h3>
         <a href="./index.html" title="$projectname">$projectname</a> 
         #if $modulename
@@ -67,11 +67,19 @@
                         #if $access#<code>$access</code>#end if#
 
                         #if $static#<code>$static</code>#end if#
+                        #if $abstract#<code>$abstract</code>#end if#
+                        #if $interface#<code>$interface</code>#end if#
                         #if $final#<code>$final</code>#end if#
                             Class <b property="yui:name">$classname</b>
                         <span class="extends">
                         #if $extends
                            - extends <a href="${extends}.html" title="$extends">$extends</a>
+                        #end if
+                        </span>
+
+                        <span class="implements">
+                        #if $implements
+                           - implements <a href="${implements}.html" title="$implements">$implements</a>
                         #end if
                         </span>
 
@@ -95,6 +103,19 @@
                             <dt>Known Subclasses:</dt>
                             <dd>
                                 #for $subclass in $subclasses
+                                    <span rel="yui:subclass" resource="${subclass}.html">
+                                    <a href="${subclass}.html" property="yui:name" title="$subclass">$subclass</a>
+                                    </span>
+                                #end for
+                            </dd>
+                       </dl>
+                    #end if
+
+                    #if $implementations
+                        <dl class="implementations" rel="yui:implementations">
+                            <dt>Known Implementations:</dt>
+                            <dd>
+                                #for $subclass in $implementations
                                     <span rel="yui:subclass" resource="${subclass}.html">
                                     <a href="${subclass}.html" property="yui:name" title="$subclass">$subclass</a>
                                     </span>
@@ -162,6 +183,20 @@
                                         </dl>
                                     #end if 
                                     
+                                    #if $constructor.throwses
+                                        <dl>
+                                            <dt>Throws:</dt>
+                                            #for $throws in $constructor.throwses
+                                                <dd rel="yui:throws">
+                                                    <code>
+                                                    &lt;<span property="yui:type">$throws.type</span>&gt;
+                                                    </code>
+                                                    <span property="yui:description">$throws.description</span>
+                                                </dd>
+                                            #end for
+                                        </dl>
+                                    #end if
+
                                 </div>
                             </div>
                         </div>
@@ -176,7 +211,7 @@
                                 #for $property in $properties
                                     <div class="$property.access#if $property.deprecated# deprecated#end if#" rel="yui:property" resource="#property_$property.name">
                                     <h4><a name="property_$property.name" property="yui:name">$property.name</a>
-                                        - <code>#if $property.access#$property.access #end if##if $property.static#$property.static #end if##if $property.final#$property.final #end if#<span property="yui:type">$property.type</span></code>
+                                        - <code>#if $property.access#$property.access #end if##if $property.static#$property.static #end if##if $property.final#$property.final #end if##if $property.constant#$property.constant #end if#<span property="yui:type">$property.type</span></code>
                                     </h4>
                                     <div class="detail">
                                         <div class="description" property="yui:description">
@@ -291,6 +326,20 @@
                                                 </dl>
                                             #end if
 
+                                            #if $method.throwses
+                                                <dl>
+                                                    <dt>Throws:</dt>
+                                                    #for $throws in $method.throwses
+                                                        <dd rel="yui:throws">
+                                                        <code>
+                                                        &lt;<span property="yui:type">$throws.type</span>&gt;
+                                                        </code>
+                                                        <span property="yui:description">$throws.description</span>
+                                                        </dd>
+                                                    #end for
+                                                </dl>
+                                            #end if
+
                                             #if $method.chainable
                                             <div class="chainable">
                                                 <strong>Chainable:</strong> This method is chainable.
@@ -383,6 +432,21 @@
                                                     #for $param in $event.params
                                                         <dd rel="yui:parameter">
                                                             <code><span property="yui:name">$param.name</span>
+                                                                &lt;<span property="yui:type">$param.type</span>&gt;
+                                                            </code>
+                                                            <span property="yui:description">$param.description</span>
+                                                        </dd>
+                                                        
+                                                    #end for
+                                                </dl>
+                                            #end if
+
+                                            #if $event.throwses
+                                                <dl>
+                                                    <dt>Throws:</dt>
+                                                    #for $throws in $event.throwses
+                                                        <dd rel="yui:throws">
+                                                            <code>
                                                                 &lt;<span property="yui:type">$param.type</span>&gt;
                                                             </code>
                                                             <span property="yui:description">$param.description</span>

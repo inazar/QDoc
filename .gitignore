@@ -4,3 +4,4 @@ build_tmp
 .git
 CVS/
 .svn
+src/
