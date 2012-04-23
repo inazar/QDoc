@@ -5,3 +5,5 @@ build_tmp
 CVS/
 .svn
 src/
+bin/js.sh
+bin/php.sh
