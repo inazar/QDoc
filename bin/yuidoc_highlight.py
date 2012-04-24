@@ -26,7 +26,7 @@ log = logging.getLogger('yuidoc.highlight')
 
 class DocHighlighter(object):
 
-    def __init__(self, inputdirs, outputdir, ext, newext):
+    def __init__(self, inputdirs, outputdir, ext, newext, exclude):
 
         def _mkdir(newdir):
             if os.path.isdir(newdir): pass
@@ -80,18 +80,25 @@ class DocHighlighter(object):
             out.close()
 
         def highlightDir(path, head=""):
+            def _fnmatch(name, exclude):
+                for x in exclude:
+                    if re.search(fnmatch.translate(x), name):
+                        return False
+                return True
+
             subdirs = []
             heads = []
             dircontent = ""
             for i in os.listdir(path):
                 fullname = os.path.join(path, i)
-                if os.path.isdir(fullname):
-                    subdirs.append(fullname)
-                    heads.append(i)
-                else:
-                    for ext in self.ext_check:
-                        if i.lower().endswith(ext):
-                            highlightFile(path, i, head)
+                if head not in exclude:
+                    if os.path.isdir(fullname):
+                        subdirs.append(fullname)
+                        heads.append(i)
+                    else:
+                        for ext in self.ext_check:
+                            if i.lower().endswith(ext):
+                                highlightFile(path, i, head)
 
             for h, i in zip(heads, subdirs):
                 highlightDir(i, os.path.join(head, h))
@@ -122,12 +129,16 @@ def main():
     optparser.add_option( "-n", "--newextension",
                           action="store", dest="newext", type="string",
                           help="The extension to append to the output file" )
+    optparser.add_option( "-x", "--exclude",
+                          action="append", dest="exclude", default=[],
+                          help="Pattern to exclude from processing" )
     (opts, inputdirs) = optparser.parse_args()
     if len(inputdirs) > 0:
         docparser = DocHighlighter( inputdirs, 
                             opts.outputdir, 
                             opts.ext,
-                            opts.newext )
+                            opts.newext,
+                            opts.exclude )
     else:
         optparser.error("Incorrect number of arguments")
            

@@ -36,7 +36,7 @@ log = logging.getLogger('yuidoc.parse')
 
 class DocParser(object):
 
-    def __init__(self, inputdirs, outputdir, outputfile, extension, version, yuiversion):
+    def __init__(self, inputdirs, outputdir, outputfile, extension, version, yuiversion, exclude):
         
         def _mkdir(newdir):
             if os.path.isdir(newdir): pass
@@ -77,13 +77,14 @@ class DocParser(object):
                     # Checking for known bad directory: CVS
                     if i != 'CVS':
                         fullname = os.path.join(path, i)
-                        if os.path.isdir(fullname):
-                            subdirs.append(fullname)
-                            heads.append(i)
-                        else:
-                            for ext in self.extension_check:
-                                if i.lower().endswith(ext):
-                                    dircontent += parseFile(path, i, head)
+                        if head not in exclude:
+                            if os.path.isdir(fullname):
+                                subdirs.append(fullname)
+                                heads.append(i)
+                            else:
+                                for ext in self.extension_check:
+                                    if i.lower().endswith(ext):
+                                        dircontent += parseFile(path, i, head)
 
             for h, i in zip(heads, subdirs):
                 dircontent += parseDir(i, os.path.join(head, h))

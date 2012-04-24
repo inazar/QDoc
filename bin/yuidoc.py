@@ -60,6 +60,9 @@ def main():
     optparser.add_option( "-v", "--version",
                           action="store", dest="version", type="string",
                           help="The version of the project" )
+    optparser.add_option( "-x", "--exclude",
+                          action="append", dest="exclude", default=[],
+                          help="Pattern to exclude from processing" )
 
     optparser.add_option( "-u", "--projecturl",
                           action="store", dest="projecturl", type="string",
@@ -81,13 +84,16 @@ def main():
                             opts.parserfile, 
                             opts.extension,
                             opts.version,
-                            opts.yuiversion
+                            opts.yuiversion,
+                            opts.exclude
                             )
 
         highlighter = yuidoc_highlight.DocHighlighter( [opts.parseroutdir], 
                             opts.parseroutdir, 
                             opts.extension,
-                            opts.newext )
+                            opts.newext,
+                            opts.exclude
+                            )
 
         gen = yuidoc_generate.DocGenerator( opts.parseroutdir, 
                                opts.parserfile, 
