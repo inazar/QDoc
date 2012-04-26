@@ -135,6 +135,7 @@ class DocParser(object):
         self.deferredModuleFiles=[]
         self.globals={}
         self.currentGlobal=""
+        self.currentEmitter = False
 
         log.info("-------------------------------------------------------")
 
@@ -680,6 +681,9 @@ it was empty" % token
 
             # self.data[CLASS_LIST].append(target)
             ############
+
+            if EMITS not in target: target[EMITS] = []
+            self.currentEmitter = target[EMITS]
             
             tokenMap.pop(CLASS)
                 
@@ -696,9 +700,6 @@ it was empty" % token
 
             c = self.data[CLASS_MAP][self.currentClass]
 
-            # keep track of current method
-            self.currentMethod = method
-
             # log.info(" @method "  + method)
 
             if not METHODS in c: c[METHODS] = {}
@@ -709,6 +710,8 @@ it was empty" % token
                 c[METHODS][method] = parseParams(tokenMap, { EMITS: [] })
                 c[METHODS][method] = parseReturn(tokenMap, c[METHODS][method])
                 c[METHODS][method] = parseThrows(tokenMap, c[METHODS][method])
+
+            self.currentEmitter = c[METHODS][method][EMITS]
 
             tokenMap.pop(METHOD)
 
@@ -747,16 +750,12 @@ it was empty" % token
                 c[EVENTS][key] = parseThrows(tokenMap, c[EVENTS][key])
 
             target = c[EVENTS][key]
-
-            if self.currentMethod:
-                c[METHODS][self.currentMethod][EMITS].append({ WHEN: when, NAME: event, DESCRIPTION: description })
+            if type(self.currentEmitter) is list:
+                self.currentEmitter.append({ WHEN: when, NAME: event, DESCRIPTION: description })
             else:
-                if self.currentConstructor:
-                    c[CONSTRUCTORS][0][EMITS].append({ WHEN: when, NAME: event, DESCRIPTION: description })
-                else:
-                    log.error("Error: @event tag for event '%s' found before @constructor or @method was found.\n****\n" %(event))
-                    self.currentMethod = self.currentGlobal
-                    sys.exit(1)
+                log.error("Error: @event tag for event '%s' found before @class, @constructor or @method was found.\n****\n" %(event))
+                self.currentMethod = self.currentGlobal
+                sys.exit(1)
 
 
             tokenMap.pop(EVENT)
@@ -890,10 +889,13 @@ the attribute\'s value has changed.' %(config),
 
             c = self.data[CLASS_MAP][self.currentClass]
             if not CONSTRUCTORS in c: c[CONSTRUCTORS] = []
-            constructor = self.currentConstructor = parseParams(tokenMap, { DESCRIPTION: tokenMap[DESCRIPTION][0], EMITS: [] })
+            constructor = self.currentConstructor = parseParams(tokenMap, { DESCRIPTION: tokenMap[DESCRIPTION][0], EMITS: c[EMITS] })
             self.currentMethod = ""
+            self.currentEmitter = constructor[EMITS]
+
             if not c[CONSTRUCTORS].count(constructor):
                 c[CONSTRUCTORS].append(constructor)
+
             tokenMap.pop(CONSTRUCTOR)
 
         # process the rest of the tags
