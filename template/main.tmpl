@@ -202,11 +202,8 @@
                                             <dt>Emits:</dt>
                                             #for $emit in $constructor.emits
                                                 <dd rel="yui:emit">
-                                                    <code><span property="yui:name">$emit.name</span>
-                                                    #if $emit.when
-                                                    &lt;<span property="yui:type">$emit.when</span>&gt;
-                                                    #end if
-                                                    </code>
+                                                    <a href="#event_$emit.link" title="$emit.name">
+                                                    <code><span property="yui:name">$emit.name</span></code></a>
                                                     #if $emit.description
                                                     <span property="yui:description">$emit.description</span>
                                                     #end if
@@ -363,11 +360,9 @@
                                                     <dt>Emits:</dt>
                                                     #for $emit in $method.emits
                                                         <dd rel="yui:emit">
+                                                            <a href="#event_$emit.link" title="$emit.name">
                                                             <code><span property="yui:name">$emit.name</span>
-                                                            #if $emit.when
-                                                            &lt;<span property="yui:type">$emit.when</span>&gt;
-                                                            #end if
-                                                            </code>
+                                                            </code></a>
                                                             #if $emit.description
                                                             <span property="yui:description">$emit.description</span>
                                                             #end if
@@ -430,8 +425,7 @@
                                 #for $event in $events
                                     <div class="$event.access#if $event.deprecated# deprecated#end if#" rel="yui:event" resource="#event_$event.name">
                                     <h4>
-                                        <a name="event_$event.name#if $event.when#_&lt;$event.when&gt;#end if#">$event.name#if $event.when# &lt;$event.when&gt;#end if#
-                                        </a></h4>
+                                        <a name="event_$event.link">$event.name</a></h4>
                                     <div class="detail">
                                         <code>
                                         #if $event.access# $event.access #end if#
@@ -544,7 +538,7 @@
                                     #for $event in $inherited.events[$superclassname]
                                         #set i=i+1
                                         <span rel="yui:event" resource="${superclassname}.html#event_$event.name">
-                                        <a class="$event.access#if $event.deprecated# deprecated#end if#" href="${assetspath}${superclassname}.html#event_$event.name#if $event.when#_&lt;$event.when&gt;#end if#" property="yui:name" title="$event.name#if $event.when# &lt;$event.when&gt;#end if#">$event.name#if $event.when# &lt;$event.when&gt;#end if#</a>#if $i<$l#<span class="$event.access#if $event.deprecated# deprecated#end if#">,</span>#end if##set i=i+1#
+                                        <a class="$event.access#if $event.deprecated# deprecated#end if#" href="${assetspath}${superclassname}.html#event_$event.link" property="yui:name" title="$event.name">$event.name</a>#if $i<$l#<span class="$event.access#if $event.deprecated# deprecated#end if#">,</span>#end if##set i=i+1#
                                         </span>
                                     #end for#
                                 </code>
@@ -762,7 +756,7 @@
                         <h4>Events</h4>
                         <ul class="content">        
                             #for $event in $events
-                                <li class="${event.access}#if $event.deprecated# deprecated#end if#"><a href="${assetspath}#event_${event.name}#if $event.when#_&lt;$event.when&gt;#end if#" title="$event.name#if $event.when# &lt;$event.when&gt;#end if#">$event.name#if $event.when# &lt;$event.when&gt;#end if#</a></li>
+                                <li class="${event.access}#if $event.deprecated# deprecated#end if#"><a href="#event_$event.link" title="$event.name">$event.name</a></li>
                             #end for
                         </ul>
                     </div>

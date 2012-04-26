@@ -259,7 +259,7 @@ class DocGenerator(object):
                             if PRIVATE in superevent: access = PRIVATE
                             elif PROTECTED in superevent: access = PROTECTED
                             else:access = ""
-                            inhdef.append({NAME: event, ACCESS: access, DEPRECATED: DEPRECATED in superevent, WHEN: superevent[WHEN]})
+                            inhdef.append({NAME: superevent[NAME], LINK: superevent[LINK], ACCESS: access, DEPRECATED: DEPRECATED in superevent})
                 if CONFIGS in superc:
                     inhdef = dict[CONFIGS][supercname] = []
                     keys = superc[CONFIGS].keys()
@@ -540,8 +540,8 @@ class DocGenerator(object):
                                     me = method[EMITS]
                                     for p in me:
                                         emit = {}
-                                        transferToDict( WHEN, p, emit )
                                         transferToDict( NAME, p, emit )
+                                        transferToDict( LINK, p, emit )
                                         transferToDict( DESCRIPTION, p, emit )
                                         emits.append(emit)
 
@@ -556,10 +556,10 @@ class DocGenerator(object):
                             event = c[EVENTS][eventkey]
                             if self.showprivate or PRIVATE not in event:
                                 eventdata = {
-                                    NAME: eventkey, 
+                                    NAME: event[NAME], 
                                     HOST: i, 
                                     TYPE: 'event', 
-                                    URL: getUrl(i, eventkey, EVENT)
+                                    URL: getUrl(i, event[LINK], EVENT)
                                 }
 
                                 transferToDict( ACCESS,      event, eventdata )
@@ -572,7 +572,7 @@ class DocGenerator(object):
 
                                 moduleprops.append(eventdata.copy())
 
-                                transferToDict( WHEN,        event, eventdata )
+                                transferToDict( LINK,        event, eventdata )
                                 transferToDict( DESCRIPTION, event, eventdata )
                                 transferToDict( DEPRECATED,  event, eventdata, NBWS, DEPRECATED )
                                 transferToDict( SEE,         event, eventdata )
@@ -727,8 +727,8 @@ class DocGenerator(object):
                             ce = constructor[EMITS]
                             for p in ce:
                                 emit = {}
-                                transferToDict( WHEN, p, emit )
                                 transferToDict( NAME, p, emit )
+                                transferToDict( LINK, p, emit )
                                 transferToDict( DESCRIPTION, p, emit )
                                 emits.append(emit)
 

@@ -50,6 +50,7 @@ IGNORE_PATTERNS = ('*.pyc','CVS','^.git','.svn')
 IMPLEMENTS='implements'
 IMPLEMENTATION='implementation'
 INTERFACE='interface'
+LINK='link'
 LONGNAME='longname'
 LOGCONFIG='yuidoclog.conf'
 METHOD='method'

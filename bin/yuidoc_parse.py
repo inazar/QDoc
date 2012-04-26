@@ -742,21 +742,23 @@ it was empty" % token
             
             key = event + " <" + when + ">" if when else event
 
+            link = string.replace(event + "_&lt;" + when + "&gt;" if when else event, "/", "_")
+            name =  event + " &lt;" + when + "&gt;" if when else event
+
             if key in c[EVENTS]:
                 log.warn("event '%s' <%s> was emited more than once" %(event, when))
             else:
-                c[EVENTS][key] = parseParams(tokenMap, { WHEN: when })
+                c[EVENTS][key] = parseParams(tokenMap, { NAME: name, LINK: link, DESCRIPTION: description })
                 c[EVENTS][key] = parseReturn(tokenMap, c[EVENTS][key])
                 c[EVENTS][key] = parseThrows(tokenMap, c[EVENTS][key])
 
             target = c[EVENTS][key]
             if type(self.currentEmitter) is list:
-                self.currentEmitter.append({ WHEN: when, NAME: event, DESCRIPTION: description })
+                self.currentEmitter.append({ NAME: name, LINK: link, DESCRIPTION: description })
             else:
                 log.error("Error: @event tag for event '%s' found before @class, @constructor or @method was found.\n****\n" %(event))
                 self.currentMethod = self.currentGlobal
                 sys.exit(1)
-
 
             tokenMap.pop(EVENT)
 
