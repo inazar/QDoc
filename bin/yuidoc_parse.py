@@ -401,16 +401,10 @@ class DocParser(object):
                         log.error("\nError, a throws could not be parsed:\n\n %s\n\n %s\n" %(i, pprint.pformat(tokenMap)))
                         sys.exit()
 
-                    mo = self.param_pat.match(description)
-                    if mo:
-                        # description.encode('utf-8', 'xmlcharrefreplace')
-
-                        dict[desttag].append({  
-                                TYPE:        type, 
-                                DESCRIPTION: description 
-                            })
-                    else:
-                        log.error("Error, could not parse throws -- %s, %s --" %(type, description))
+                    dict[desttag].append({  
+                            TYPE:        type, 
+                            DESCRIPTION: description 
+                        })
 
                 tokenMap.pop(srctag)
             return dict 
@@ -426,7 +420,7 @@ class DocParser(object):
                
             if longName in self.data[CLASS_MAP]:
                 # print "WARNING: %s - Class %s was redefined" %(tokens, longName)
-                log.warn("WARNING: Class %s was redefined" %(longName))
+                log.warn("Class %s was redefined" %(longName))
             else:
                 self.data[CLASS_MAP][longName] = c
 
@@ -447,10 +441,10 @@ class DocParser(object):
                     desc = next()
                     if not desc or isTag(desc):
                         if desc:
-                            msg = "WARNING: expected a description block for tag @%s but \
+                            msg = "expected a description block for tag @%s but \
 found another tag @%s" % (token, desc)
                         else:
-                            msg = "WARNING: expected a description block for tag @%s but \
+                            msg = "expected a description block for tag @%s but \
 it was empty" % token
 
                         log.warn("\n" + self.currentFile + "\n" + msg + ":\n\n" + unicode(tokens) + "\n")
@@ -694,7 +688,7 @@ it was empty" % token
             method = tokenMap[METHOD][0]
 
             if not self.currentClass:
-                log.warn("WARNING: @method tag found before @class was found.\n****\n" + method + ", making global " + self.currentGlobal + " current class")
+                log.warn("@method tag found before @class was found.\n****\n" + method + ", making global " + self.currentGlobal + " current class")
                 self.currentClass = self.currentGlobal
                 #sys.exit()
                 # if FOR in tokenMap:
@@ -702,18 +696,19 @@ it was empty" % token
 
             c = self.data[CLASS_MAP][self.currentClass]
 
+            # keep track of current method
+            self.currentMethod = method
+
             # log.info(" @method "  + method)
 
             if not METHODS in c: c[METHODS] = {}
             
             if method in c[METHODS]:
-                log.warn("WARNING: method %s was redefined" %(method))
+                log.warn("method %s was redefined" %(method))
             else:
-                c[METHODS][method] = parseParams(tokenMap, {})
+                c[METHODS][method] = parseParams(tokenMap, { EMITS: [] })
                 c[METHODS][method] = parseReturn(tokenMap, c[METHODS][method])
                 c[METHODS][method] = parseThrows(tokenMap, c[METHODS][method])
-
-            target = c[METHODS][method]
 
             tokenMap.pop(METHOD)
 
@@ -724,16 +719,43 @@ it was empty" % token
                 # sys.exit()
 
             c = self.data[CLASS_MAP][self.currentClass]
-            event = tokenMap[EVENT][0]
+            match = self.compound_pat.match(tokenMap[EVENT][0])
+
+            if match:
+                if match.group(4):
+                    when, event = "", match.group(4) + match.group(5)
+                else:
+                    when, event = match.group(2), (match.group(1) + match.group(3)).strip()
+            else:
+                when, event = "", ""
+
+            mo = self.param_pat.match(event)
+            description = ""
+            if mo:
+                event = mo.group(1)
+                description = mo.group(2)
 
             if not EVENTS in c: c[EVENTS] = {}
             
-            if event in c[EVENTS]:
-                log.warn("WARNING: event %s was redefined" %(event))
+            if event in c[EVENTS] and c[EVENTS][event][WHEN] == when:
+                log.warn("event '%s' <%s> was emited more than once" %(event, when))
             else:
-                c[EVENTS][event] = parseParams(tokenMap, {})
+                c[EVENTS][event] = parseParams(tokenMap, { WHEN: when })
+                c[EVENTS][event] = parseReturn(tokenMap, c[EVENTS][event])
+                c[EVENTS][event] = parseThrows(tokenMap, c[EVENTS][event])
 
             target = c[EVENTS][event]
+
+            if self.currentMethod:
+                c[METHODS][self.currentMethod][EMITS].append({ WHEN: when, NAME: event, DESCRIPTION: description })
+            else:
+                if self.currentConstructor:
+                    c[CONSTRUCTORS][0][EMITS].append({ WHEN: when, NAME: event, DESCRIPTION: description })
+                else:
+                    log.error("Error: @event tag for event '%s' found before @constructor or @method was found.\n****\n" %(event))
+                    self.currentMethod = self.currentGlobal
+                    sys.exit(1)
+
 
             tokenMap.pop(EVENT)
 
@@ -750,7 +772,7 @@ it was empty" % token
             if not PROPERTIES in c: c[PROPERTIES] = {}
             
             if property in c[PROPERTIES]:
-                log.warn("WARNING: Property %s was redefined" %(property))
+                log.warn("Property %s was redefined" %(property))
             else:
                 c[PROPERTIES][property] = {}
 
@@ -775,7 +797,7 @@ it was empty" % token
             if not CONFIGS in c: c[CONFIGS] = {}
             
             if config in c[CONFIGS]:
-                log.warn("WARNING: Property %s was redefined" %(config))
+                log.warn("Property %s was redefined" %(config))
             else:
                 c[CONFIGS][config] = {}
 
@@ -851,7 +873,7 @@ the attribute\'s value has changed.' %(config),
             target, tokenMap = parseModule(tokenMap)
 
         else:
-            msg = "WARNING: doc block type ambiguous, no @class, @module, @method, \
+            msg = "doc block type ambiguous, no @class, @module, @method, \
 @event, @property, or @config tag found.  This block may be skipped"
             log.warn("\n" + self.currentFile + "\n" + msg + ":\n\n" + unicode(tokens) + "\n")
 
@@ -866,7 +888,8 @@ the attribute\'s value has changed.' %(config),
 
             c = self.data[CLASS_MAP][self.currentClass]
             if not CONSTRUCTORS in c: c[CONSTRUCTORS] = []
-            constructor = parseParams(tokenMap, { DESCRIPTION: tokenMap[DESCRIPTION][0] })
+            constructor = self.currentConstructor = parseParams(tokenMap, { DESCRIPTION: tokenMap[DESCRIPTION][0], EMITS: [] })
+            self.currentMethod = ""
             if not c[CONSTRUCTORS].count(constructor):
                 c[CONSTRUCTORS].append(constructor)
             tokenMap.pop(CONSTRUCTOR)

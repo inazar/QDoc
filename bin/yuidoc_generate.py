@@ -259,7 +259,7 @@ class DocGenerator(object):
                             if PRIVATE in superevent: access = PRIVATE
                             elif PROTECTED in superevent: access = PROTECTED
                             else:access = ""
-                            inhdef.append({NAME: event, ACCESS: access, DEPRECATED: DEPRECATED in superevent})
+                            inhdef.append({NAME: event, ACCESS: access, DEPRECATED: DEPRECATED in superevent, WHEN: superevent[WHEN]})
                 if CONFIGS in superc:
                     inhdef = dict[CONFIGS][supercname] = []
                     keys = superc[CONFIGS].keys()
@@ -535,6 +535,16 @@ class DocGenerator(object):
                                         transferToDict( DESCRIPTION, p, throw )
                                         throws.append(throw)
 
+                                emits = methoddata[EMITS] = []
+                                if EMITS in method:
+                                    me = method[EMITS]
+                                    for p in me:
+                                        emit = {}
+                                        transferToDict( WHEN, p, emit )
+                                        transferToDict( NAME, p, emit )
+                                        transferToDict( DESCRIPTION, p, emit )
+                                        emits.append(emit)
+
                                 methods.append(methoddata)
 
                     # Events
@@ -562,6 +572,7 @@ class DocGenerator(object):
 
                                 moduleprops.append(eventdata.copy())
 
+                                transferToDict( WHEN,        event, eventdata )
                                 transferToDict( DESCRIPTION, event, eventdata )
                                 transferToDict( DEPRECATED,  event, eventdata, NBWS, DEPRECATED )
                                 transferToDict( SEE,         event, eventdata )
@@ -591,6 +602,11 @@ class DocGenerator(object):
                                         transferToDict( TYPE,        p, param, OBJECT )
                                         transferToDict( DESCRIPTION, p, param )
                                         params.append(param)
+
+                                ret = eventdata[RETURN] = {NAME:"", DESCRIPTION:"", TYPE:""}
+                                if RETURN in event:
+                                    transferToDict( TYPE,        event[RETURN], ret, "" )
+                                    transferToDict( DESCRIPTION, event[RETURN], ret )
 
                                 throws = eventdata[THROWS] = []
                                 if THROWS in event:
@@ -706,6 +722,15 @@ class DocGenerator(object):
                                 transferToDict( DESCRIPTION, p, throw )
                                 throws.append(throw)
 
+                        emits = constructordata[EMITS] = []
+                        if EMITS in constructor:
+                            ce = constructor[EMITS]
+                            for p in ce:
+                                emit = {}
+                                transferToDict( WHEN, p, emit )
+                                transferToDict( NAME, p, emit )
+                                transferToDict( DESCRIPTION, p, emit )
+                                emits.append(emit)
 
                     # write module splash
                     moduleprops.sort(allprop_sort)
