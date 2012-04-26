@@ -737,14 +737,16 @@ it was empty" % token
 
             if not EVENTS in c: c[EVENTS] = {}
             
-            if event in c[EVENTS] and c[EVENTS][event][WHEN] == when:
+            key = event + " <" + when + ">" if when else event
+
+            if key in c[EVENTS]:
                 log.warn("event '%s' <%s> was emited more than once" %(event, when))
             else:
-                c[EVENTS][event] = parseParams(tokenMap, { WHEN: when })
-                c[EVENTS][event] = parseReturn(tokenMap, c[EVENTS][event])
-                c[EVENTS][event] = parseThrows(tokenMap, c[EVENTS][event])
+                c[EVENTS][key] = parseParams(tokenMap, { WHEN: when })
+                c[EVENTS][key] = parseReturn(tokenMap, c[EVENTS][key])
+                c[EVENTS][key] = parseThrows(tokenMap, c[EVENTS][key])
 
-            target = c[EVENTS][event]
+            target = c[EVENTS][key]
 
             if self.currentMethod:
                 c[METHODS][self.currentMethod][EMITS].append({ WHEN: when, NAME: event, DESCRIPTION: description })
