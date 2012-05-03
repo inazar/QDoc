@@ -504,6 +504,7 @@ class DocGenerator(object):
                                 transferToDict( DEPRECATED,  method, methoddata, NBWS, DEPRECATED )
                                 transferToDict( SEE,         method, methoddata )
                                 transferToDict( STATIC,      method, methoddata )
+                                transferToDict( DEFAULT,     method, methoddata )
                                 if STATIC in method: methoddata[STATIC] = STATIC
                                 transferToDict( FINAL,      method, methoddata )
                                 if FINAL in method: methoddata[FINAL] = FINAL
@@ -524,6 +525,7 @@ class DocGenerator(object):
                                         transferToDict( NAME,        p, param, UNKNOWN )
                                         transferToDict( TYPE,        p, param, OBJECT )
                                         transferToDict( DESCRIPTION, p, param )
+                                        transferToDict( DEFAULT,     p, param )
                                         params.append(param)
 
                                 throws = methoddata[THROWS] = []
@@ -642,7 +644,7 @@ class DocGenerator(object):
 
                                 transferToDict( TYPE,        config, configdata, OBJECT )
                                 transferToDict( DESCRIPTION, config, configdata           )
-                                transferToDict( DEFAULT, config, configdata           )
+                                transferToDict( DEFAULT,     config, configdata           )
                                 transferToDict( DEPRECATED,  config, configdata, NBWS, DEPRECATED )
                                 transferToDict( SEE,         config, configdata           )
                                 transferToDict( STATIC,      config, configdata           )

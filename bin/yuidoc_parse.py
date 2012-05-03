@@ -188,7 +188,8 @@ class DocParser(object):
     
     # after extracting the comment, fix it up (remove *s and leading spaces)
     # blockFilter_pat = re.compile('^\s*\*', re.M)
-    blockFilter_pat = re.compile('^[\s|\*|\n]*', re.M)
+#    blockFilter_pat = re.compile('^[\s|\*|\n]*', re.M)
+    blockFilter_pat = re.compile('^\s*[ \n\f\v\r|\*|\n]*', re.M)
 
     # the pattern used to split a comment block to create our token stream
     # this will currently break if there are ampersands in the comments if there
@@ -197,11 +198,13 @@ class DocParser(object):
 
     # separates compound descriptions: @param foo {int} a foo -> int, foo a foo
     # also:                            @param {int} foo a foo -> int, foo a foo
-    compound_pat = re.compile('^\s*?(.*?)\{(.*)\}(.*)|^\s*?(\w+)(.*)', re.S);
+    compound_pat = re.compile('^\s*?(.*?)\{(.*?)\}(.*)|^\s*?(\w+)(.*)', re.S);
 
     # pulls out the first word of the description parsed by compound_pat: foo, a foo
     # param_pat = re.compile('^\s*?(\w+)(.*)', re.S);
     param_pat = re.compile('^\s*?([^\s]+)(.*)', re.S);
+
+    def_pat = re.compile('([^\s]+)=(.*)');
 
     # tags that do not require a description, used by the tokenizer so that these
     # tags can be used above the block description without breaking things
@@ -342,12 +345,24 @@ class DocParser(object):
                         name = mo.group(1)
                         description = mo.group(2)
                         # description.encode('utf-8', 'xmlcharrefreplace')
-
-                        dict[desttag].append({  
+                        mo = self.def_pat.match(name)
+                        if mo and mo.lastindex == 2:
+                            param = {  
+                                NAME:        mo.group(1),
+                                TYPE:        type, 
+                                DESCRIPTION: description,
+                                DEFAULT:     mo.group(2)
+                            }
+                            name = mo.group(1)
+                            default = mo.group(2)
+                        else:
+                            param = {  
                                 NAME:        name,
                                 TYPE:        type, 
-                                DESCRIPTION: description 
-                            })
+                                DESCRIPTION: description
+                            }
+
+                        dict[desttag].append(param)
                     else:
                         log.error("Error, could not parse param -- %s, %s --" %(type, description))
 
@@ -712,6 +727,7 @@ it was empty" % token
                 c[METHODS][method] = parseThrows(tokenMap, c[METHODS][method])
 
             self.currentEmitter = c[METHODS][method][EMITS]
+            target = c[METHODS][method]
 
             tokenMap.pop(METHOD)
 
@@ -746,7 +762,7 @@ it was empty" % token
             name =  event + " &lt;" + when + "&gt;" if when else event
 
             if key in c[EVENTS]:
-                log.warn("event '%s' <%s> was emited more than once" %(event, when))
+                log.info("event '%s' <%s> was emited more than once" %(event, when))
             else:
                 c[EVENTS][key] = parseParams(tokenMap, { NAME: name, LINK: link, DESCRIPTION: description })
                 c[EVENTS][key] = parseReturn(tokenMap, c[EVENTS][key])
@@ -891,7 +907,7 @@ the attribute\'s value has changed.' %(config),
 
             c = self.data[CLASS_MAP][self.currentClass]
             if not CONSTRUCTORS in c: c[CONSTRUCTORS] = []
-            constructor = self.currentConstructor = parseParams(tokenMap, { DESCRIPTION: tokenMap[DESCRIPTION][0], EMITS: c[EMITS] })
+            constructor = self.currentConstructor = parseParams(tokenMap, { EMITS: c[EMITS] })
             self.currentMethod = ""
             self.currentEmitter = constructor[EMITS]
 
