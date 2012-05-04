@@ -92,10 +92,7 @@ makeDocs()
 
   if [ -n "$OUTPUT" ]
   then
-    echo "RECIP: $RECIP"
-    echo "SUBJECT: '$MODULE: $SUBJECT'"
-    echo "$OUTPUT"
-  # echo $OUTPUT | mail -s "$MODULE: $SUBJECT" $RECIP
+    echo $OUTPUT | mail -s "$MODULE: $SUBJECT" $RECIP
   fi
 }
 
