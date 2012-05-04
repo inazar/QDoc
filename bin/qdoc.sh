@@ -97,3 +97,6 @@ makeDocs()
 }
 
 makeDocs &
+
+echo "Started to generate API documentation"
+exit 0
