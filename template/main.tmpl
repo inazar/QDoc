@@ -154,6 +154,9 @@
                                                 #set $i = $i + 1
                                                 #set $current = $param.name
                                                 $param.name
+                                                #if $param.default
+                                                    = $param.default
+                                                #end if
                                             #end if
                                         #end for
                                     #end if

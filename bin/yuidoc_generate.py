@@ -713,6 +713,7 @@ class DocGenerator(object):
                                 transferToDict( NAME,        p, param, UNKNOWN )
                                 transferToDict( TYPE,        p, param, OBJECT )
                                 transferToDict( DESCRIPTION, p, param )
+                                transferToDict( DEFAULT,     p, param )
                                 params.append(param)
 
                         throws = constructordata[THROWS] = []
