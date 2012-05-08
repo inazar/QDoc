@@ -1,6 +1,5 @@
 #!/usr/bin/env python2.6
 
-import yuidoc_parse, yuidoc_highlight, yuidoc_generate
 import sys, os, logging, logging.config
 from const import *
 
@@ -71,6 +70,7 @@ def main():
 		optparser.error("Incorrect number of arguments")
 
 	logging.custom = {"mailhost": "localhost", "fromaddr": opts.fromaddr, "toaddr": opts.toaddr, "subject": opts.subject}
+	import yuidoc_parse, yuidoc_highlight, yuidoc_generate
 
 	for params in parserIn:
 		(comment, source, inputList, extension, outdir, exdir) = params
