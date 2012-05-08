@@ -33,7 +33,6 @@ except:
 
 log = logging.getLogger('yuidoc.parse')
 
-
 class DocParser(object):
 
     def __init__(self, inputdirs, outputdir, outputfile, extension, version, yuiversion, exclude):
