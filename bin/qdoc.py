@@ -4,6 +4,7 @@ import yuidoc_parse, yuidoc_highlight, yuidoc_generate
 import sys, os, logging, logging.config
 from const import *
 
+qddir, tmp = os.path.split(sys.path[0])
 basedir, tmp = os.path.split(sys.path[0])
 
 frameworkList = ["Q", "Db", "plugins/Awards", "plugins/Broadcast", "plugins/Metrics", "plugins/Places", "plugins/Streams", "plugins/Users"]
@@ -66,7 +67,7 @@ def main():
 
 	(opts, inputdirs) = optparser.parse_args()
 
-	if not opts.fromaddr and not opts.toaddr:
+	if not opts.fromaddr or not opts.toaddr:
 		optparser.error("Incorrect number of arguments")
 
 	logging.custom = {"mailhost": "localhost", "fromaddr": opts.fromaddr, "toaddr": opts.toaddr, "subject": opts.subject}
