@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MODULE=""
+MODULE="QDoc"
 HGBIN=/usr/local/bin/hg
 
 while [ $# -gt 0 ] ; do
