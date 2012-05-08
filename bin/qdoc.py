@@ -5,7 +5,7 @@ import sys, os, logging, logging.config
 from const import *
 
 qddir, tmp = os.path.split(sys.path[0])
-basedir, tmp = os.path.split(sys.path[0])
+basedir, tmp = os.path.split(qddir)
 
 frameworkList = ["Q", "Db", "plugins/Awards", "plugins/Broadcast", "plugins/Metrics", "plugins/Places", "plugins/Streams", "plugins/Users"]
 clientList = []
