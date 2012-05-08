@@ -4,8 +4,8 @@ import yuidoc_parse, yuidoc_highlight, yuidoc_generate
 import sys, os, logging, logging.config
 from const import *
 
-qddir, tmp = os.path.split(sys.path[0])
-basedir, tmp = os.path.split(qddir)
+qdocdir, tmp = os.path.split(sys.path[0])
+basedir, tmp = os.path.split(qdocdir)
 
 frameworkList = ["Q", "Db", "plugins/Awards", "plugins/Broadcast", "plugins/Metrics", "plugins/Places", "plugins/Streams", "plugins/Users"]
 clientList = []
@@ -100,7 +100,7 @@ def main():
 				basedir+'/docs/'+outdir+'/parser', 
 				"parsed.json", 
 				basedir+'/docs/'+outdir+'/web',
-				basedir+'/template',
+				qdocdir+'/template',
 				opts.newext,
 				opts.showprivate,
 				opts.project,
