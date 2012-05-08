@@ -35,7 +35,7 @@ parserIn = [
 		)
 	]
 
-logging.custom = {"hostname": "localhost", "fromaddr": "nginx@qbix.com", "toaddr": "nazar@qbix.com", "subject": "Test message"}
+logging.custom = {"hostname": "localhost", "fromaddr": "nginx@qbix.com", "toaddr": "nazar@qbix.com", "subject": "Test message from QDoc"}
 logging.config.fileConfig(os.path.join(sys.path[0], LOGCONFIG))
 
 log = logging.getLogger('yuidoc.tmp')
