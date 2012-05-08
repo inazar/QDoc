@@ -10,22 +10,28 @@ frameworkList = ["Q", "Db", "plugins/Awards", "plugins/Broadcast", "plugins/Metr
 clientList = []
 parserIn = [
 	(
+		"PHP API",
 		"/src/",
 		frameworkList,
 		".php",
-		"php"
+		"php",
+		["Zend", "Facebook"]
 		),
 	(
+		"node.js API",
 		"/src/",
 		frameworkList,
 		".js",
-		"node"
+		"node",
+		[]
 		),
 	(
+		"client API",
 		"/client/",
 		clientList,
 		".js",
-		"node"
+		"node",
+		[]
 		)
 	]
 
@@ -34,9 +40,7 @@ logging.config.fileConfig(os.path.join(sys.path[0], LOGCONFIG))
 
 log = logging.getLogger('yuidoc.tmp')
 
-log.info("It works!")
-
-
+log.info("It works!!!")
 
 def main():
 	from optparse import OptionParser
@@ -54,106 +58,51 @@ def main():
 	                       yuiversion=False,
 	                       ydn=False
 	                       )
-	optparser.add_option( "-b", "--basedir",
-	    action="store", dest="basedir", type="string",
-	    help="Base directory for QDoc" )
-	optparser.add_option( "-h", "--homedir",
-	    action="store", dest="homedir", type="string",
-	    help="Home directory for QDoc" )
-	optparser.add_option( "-e", "--extension",
-	    action="append", dest="extlist", default=[],
-	    help="Extension to process followed by dirname" )
-
-
-
-
-	optparser.add_option( "-p", "--parseroutdir",
-	    action="store", dest="parseroutdir", type="string",
-	    help="Directory to write the parser temp data" )
-	optparser.add_option( "-o", "--outputdir",
-	    action="store", dest="outputdir", type="string",
-	    help="Directory to write the html documentation" )
-	optparser.add_option( "-f", "--file",
-	    action="store", dest="parserfile", type="string",
-	    help="The name of the file that contains the JSON doc info" )
-	optparser.add_option( "-t", "--template",
-	    action="store", dest="templatedir", type="string",
-	    help="The directory containing the html tmplate" )
-	optparser.add_option( "-c", "--crosslink",
-	    action="store", dest="crosslinkdir", type="string",
-	    help="The directory containing json data for other modules to crosslink" )
-	optparser.add_option( "-C", "--copyright",
-	    action="store", dest="copyrighttag", type="string",
-	    help="The name to use in the copyright line at the bottom of the pages." )
-	optparser.add_option( "-s", "--showprivate",
-	    action="store_true", dest="showprivate",
-	    help="Should private properties/methods be in the docs?" )
-	optparser.add_option( "-e", "--extension",
-	                      action="store", dest="extension", type="string",
-	                      help="The extension to parse" )
-	optparser.add_option( "-n", "--newextension",
-	                      action="store", dest="newext", type="string",
-	                      help="The extension to append to the yuisyntax highlighted output file" )
-	optparser.add_option( "-m", "--project",
-	                      action="store", dest="project", type="string",
-	                      help="The name of the project" )
 	optparser.add_option( "-v", "--version",
-	                      action="store", dest="version", type="string",
-	                      help="The version of the project" )
-	optparser.add_option( "-x", "--exclude",
-	                      action="append", dest="exclude", default=[],
-	                      help="Pattern to exclude from processing" )
-
-	optparser.add_option( "-u", "--projecturl",
-	                      action="store", dest="projecturl", type="string",
-	                      help="The project url" )
-
-	optparser.add_option( "-Y", "--yuiversion",
-	                      action="store", dest="yuiversion", type="string",
-	                      help="The version of YUI library used in the project.  This parameter applies to the output for attributes, which differs between YUI2 and YUI3." )
-
-	optparser.add_option( "-y", "--ydn",
-	    action="store_true", dest="ydn",
-	    help="Add YDN MyBlogLog intrumentation?" )
+		action="store", dest="version", type="string",
+		help="The version of the project" )
 
 	(opts, inputdirs) = optparser.parse_args()
 
 	for params in parserIn:
-		(source, inputList, extension, dirname) = params
-		if len(inputList) > 0:
+		(comment, source, inputList, extension, outdir, exdir) = params
+		inputdirs = []
+		for dirname in inputList:
+			inputdirs.append(basedir+source+dirname)
+		if len(inputdirs) > 0:
 			docparser = yuidoc_parse.DocParser(
-				inputList, 
-				opts.basedir+'/', 
-				opts.parserfile, 
-				opts.extension,
+				inputdirs, 
+				basedir+'/docs/'+outdir+'/parser', 
+				"parsed.json", 
+				extension,
 				opts.version,
-				opts.yuiversion,
-				opts.exclude
+				False,
+				exdir
 				)
 
-			highlighter = yuidoc_highlight.DocHighlighter( [opts.parseroutdir], 
-				opts.parseroutdir, 
-				opts.extension,
+			highlighter = yuidoc_highlight.DocHighlighter(
+				[basedir+'/docs/'+outdir+'/parser'], 
+				basedir+'/docs/'+outdir+'/parser', 
+				extension,
 				opts.newext,
-				opts.exclude
+				exdir
 				)
 
-			gen = yuidoc_generate.DocGenerator( opts.parseroutdir, 
-				opts.parserfile, 
-				opts.outputdir,
-				opts.templatedir,
+			gen = yuidoc_generate.DocGenerator(
+				basedir+'/docs/'+outdir+'/parser', 
+				"parsed.json", 
+				basedir+'/docs/'+outdir+'/web',
+				basedir+'/template',
 				opts.newext,
 				opts.showprivate,
 				opts.project,
 				opts.version,
 				opts.projecturl,
-				opts.ydn,
+				False,
 				opts.copyrighttag
 				)
 
 			gen.process()
-		else:
-			optparser.error("Incorrect number of arguments")
-           
+
 #if __name__ == '__main__':
 #    main()
