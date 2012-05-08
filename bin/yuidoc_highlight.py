@@ -23,7 +23,6 @@ except:
 
 log = logging.getLogger('yuidoc.highlight')
 
-
 class DocHighlighter(object):
 
     def __init__(self, inputdirs, outputdir, ext, newext, exclude):

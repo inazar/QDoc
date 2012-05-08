@@ -35,16 +35,9 @@ parserIn = [
 		)
 	]
 
-logging.custom = {"mailhost": "localhost", "fromaddr": "nginx@qbix.com", "toaddr": "nazar@qbix.com", "subject": "Test message from QDoc"}
-logging.config.fileConfig(os.path.join(sys.path[0], LOGCONFIG))
-
-log = logging.getLogger('yuidoc.tmp')
-
-log.info("It works!!!")
-
 def main():
 	from optparse import OptionParser
-	optparser = OptionParser("usage: %prog inputdir [options] inputdir")
+	optparser = OptionParser("usage: %prog [options]")
 	optparser.set_defaults(extension=".js", 
 	                       newext=".highlighted",
 	                       parseroutdir="/tmp", 
@@ -61,8 +54,22 @@ def main():
 	optparser.add_option( "-v", "--version",
 		action="store", dest="version", type="string",
 		help="The version of the project" )
+	optparser.add_option( "-f", "--from",
+		action="store", dest="fromaddr", type="string", default='',
+		help="The sender for messages" )
+	optparser.add_option( "-t", "--to",
+		action="append", dest="toaddr", default=[],
+		help="Where to send the messages" )
+	optparser.add_option( "-s", "--subject",
+		action="store", dest="subject", type="string", default='QDoc log message',
+		help="The subject for messages" )
 
 	(opts, inputdirs) = optparser.parse_args()
+
+	if not opts.fromaddr and not opts.toaddr:
+		optparser.error("Incorrect number of arguments")
+
+	logging.custom = {"mailhost": "localhost", "fromaddr": opts.fromaddr, "toaddr": opts.toaddr, "subject": opts.subject}
 
 	for params in parserIn:
 		(comment, source, inputList, extension, outdir, exdir) = params
@@ -104,5 +111,5 @@ def main():
 
 			gen.process()
 
-#if __name__ == '__main__':
-#    main()
+if __name__ == '__main__':
+    main()

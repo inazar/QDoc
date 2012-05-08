@@ -33,7 +33,6 @@ except:
 
 log = logging.getLogger('yuidoc.generate')
 
-
 def _mkdir(newdir):
     if os.path.isdir(newdir): pass
     elif os.path.isfile(newdir):
