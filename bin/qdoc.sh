@@ -31,6 +31,7 @@ version=`$HGBIN id -n -r tip`
 SUBJECT=$($HGBIN log -r tip --template '{desc|firstline}')
 
 `dirname $0`/qdoc.py -v $version -f nginx@qbix.com -t $RECIP -s "$MODULE: $SUBJECT" &
+disown $!
 
 echo "Started to generate API documentation"
 exit 0
